@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Банковская антифрод система — портфолио-кейс</title>
+<script>
+  /* Тема до первой отрисовки: запомненный выбор или тёмная по умолчанию */
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('af-theme'); } catch (e) {}
+    document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
+  })();
+</script>
+<style>
+  :root{
+    --bg:#f6f7f9; --bg2:#eef0f3; --card:#ffffff; --card2:#f2f4f7;
+    --text:#1b2226; --muted:#5c686f; --line:#dfe4e8; --line2:#c3ccd3; --edge:#7d8890;
+    --hero:#eef2f6; --step-bg:#ffffff; --step-bd:#c3ccd3;
+    --pg-bg:#d9e7da; --pg-bd:#9dbfa3; --pg-tx:#274d33;
+    --af-bg:#e0d8ea; --af-bd:#b3a3c9; --af-tx:#463563;
+    --sp-bg:#d7e2f2; --sp-bd:#9fb6d8; --sp-tx:#28456e;
+    --mn-bg:#efe6cf; --mn-bd:#c9b586; --mn-tx:#5d4a1f;
+    --kf-bg:#f3e5c8; --kf-bd:#cdb280; --kf-tx:#6b4e14;
+    --rd-bg:#f4dcdc; --rd-bd:#cf9d9d; --rd-tx:#6e2b2b;
+    --nt-bg:#e6eaee; --nt-bd:#b9c2ca; --nt-tx:#39454d;
+  }
+  html[data-theme="dark"]{
+    --bg:#0e1316; --bg2:#11181c; --card:#161d22; --card2:#1b2329;
+    --text:#e6ecef; --muted:#98a5ad; --line:#2b353c; --line2:#3b474f; --edge:#66757f;
+    --hero:#12191e; --step-bg:#1b2329; --step-bd:#3b474f;
+    --pg-bg:#22392c; --pg-bd:#41704f; --pg-tx:#bfe0c8;
+    --af-bg:#332a44; --af-bd:#5d4f7a; --af-tx:#d9ccef;
+    --sp-bg:#22334e; --sp-bd:#44639a; --sp-tx:#c6d6f2;
+    --mn-bg:#3d3423; --mn-bd:#77653f; --mn-tx:#ead9b8;
+    --kf-bg:#40301d; --kf-bd:#7d5c33; --kf-tx:#f0d6ac;
+    --rd-bg:#422626; --rd-bd:#7d4444; --rd-tx:#f2c4c4;
+    --nt-bg:#242c32; --nt-bd:#3b474f; --nt-tx:#c4ced4;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font:16px/1.65 -apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    transition:background .25s,color .25s;
+  }
+  .mono,code,h1,h2,h3,.tag,.toc a{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 22px}
+
+  /* ---------- Кнопка темы ---------- */
+  .theme-toggle{
+    position:fixed; top:16px; right:16px; z-index:60; width:46px; height:46px;
+    border-radius:50%; border:1px solid var(--line2); background:var(--card);
+    color:var(--text); font-size:20px; cursor:pointer; line-height:1;
+    box-shadow:0 4px 14px rgba(0,0,0,.18); transition:transform .15s,background .25s;
+  }
+  .theme-toggle:hover{transform:scale(1.08)}
+
+  /* ---------- Hero ---------- */
+  header.hero{background:linear-gradient(180deg,var(--hero),transparent);border-bottom:1px solid var(--line);padding:64px 0 40px}
+  .overline{font:12px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+  h1{font-size:clamp(26px,4vw,38px);margin:14px 0 10px;letter-spacing:-.5px}
+  .lead{max-width:760px;color:var(--muted);font-size:17px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin:22px 0 0;font:13px ui-monospace,Menlo,Consolas,monospace;color:var(--muted)}
+  .meta b{color:var(--text);font-weight:600}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;border:1px solid;white-space:nowrap}
+  .t-pg{background:var(--pg-bg);border-color:var(--pg-bd);color:var(--pg-tx)}
+  .t-af{background:var(--af-bg);border-color:var(--af-bd);color:var(--af-tx)}
+  .t-sp{background:var(--sp-bg);border-color:var(--sp-bd);color:var(--sp-tx)}
+  .t-mn{background:var(--mn-bg);border-color:var(--mn-bd);color:var(--mn-tx)}
+  .t-kf{background:var(--kf-bg);border-color:var(--kf-bd);color:var(--kf-tx)}
+  .t-rd{background:var(--rd-bg);border-color:var(--rd-bd);color:var(--rd-tx)}
+  .t-nt{background:var(--nt-bg);border-color:var(--nt-bd);color:var(--nt-tx)}
+
+  /* ---------- Оглавление ---------- */
+  .toc{margin:34px 0 0;padding:18px 22px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+  .toc h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;border:none;padding:0}
+  .toc ol{margin:0;padding-left:20px;columns:2;column-gap:34px}
+  .toc li{margin:4px 0;break-inside:avoid}
+  .toc a{color:var(--text);text-decoration:none;font-size:14px}
+  .toc a:hover{color:var(--sp-tx);text-decoration:underline}
+  @media(max-width:640px){.toc ol{columns:1}}
+
+  /* ---------- Секции ---------- */
+  section{margin:58px 0}
+  h2{font-size:23px;border-bottom:1px solid var(--line);padding-bottom:10px;margin:0 0 20px}
+  h3{font-size:17px;margin:26px 0 10px}
+  p{margin:0 0 14px}
+  ul{margin:0 0 14px;padding-left:22px}
+  li{margin:5px 0}
+  .note{border-left:3px solid var(--sp-bd);background:var(--card2);padding:12px 16px;border-radius:0 10px 10px 0;color:var(--muted);font-size:14.5px}
+
+  /* ---------- Карточки компонентов ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px}
+  .card{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:16px 18px}
+  .card .head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .card .name{font:600 14.5px ui-monospace,Menlo,Consolas,monospace}
+  .card p{margin:0;font-size:14px;color:var(--muted)}
+  .card .why{display:block;margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:13px;color:var(--muted)}
+  .card .why b{color:var(--text);font-weight:600}
+
+  /* ---------- Figura / SVG ---------- */
+  .figure{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:20px;margin:22px 0}
+  .figure svg{width:100%;height:auto;display:block}
+  .figcap{font:12.5px ui-monospace,Menlo,Consolas,monospace;color:var(--muted);margin-top:12px}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  svg .box{fill:var(--card);stroke:var(--line2);stroke-width:1.2}
+  svg .bx-t{fill:var(--text);font:11.5px ui-monospace,Menlo,Consolas,monospace}
+  svg .bx-s{fill:var(--muted);font:9.5px ui-monospace,Menlo,Consolas,monospace}
+  svg .ct-t{fill:var(--text);font:700 15px ui-monospace,Menlo,Consolas,monospace}
+  svg .ed{stroke:var(--edge);stroke-width:1.4;fill:none}
+  svg .arw{fill:var(--edge)}
+  svg .c-pg{fill:var(--pg-bg);stroke:var(--pg-bd)}
+  svg .c-af{fill:var(--af-bg);stroke:var(--af-bd)}
+  svg .c-mn{fill:var(--mn-bg);stroke:var(--mn-bd)}
+  svg .c-sp{fill:var(--sp-bg);stroke:var(--sp-bd)}
+  svg .d-rd{fill:var(--rd-bg);stroke:var(--rd-bd)}
+  svg .d-pg{fill:var(--pg-bg);stroke:var(--pg-bd)}
+  svg .t-pg-f{fill:var(--pg-tx)} svg .t-rd-f{fill:var(--rd-tx)}
+
+  /* ---------- Сценарии (stepper) ---------- */
+  .scenario{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:20px 22px;margin:0 0 18px}
+  .scenario h3{margin:0 0 4px;font-size:16px}
+  .scenario .sub{color:var(--muted);font-size:13.5px;margin:0 0 16px}
+  .steps{list-style:none;margin:0;padding:0;counter-reset:st}
+  .steps li{position:relative;padding:0 0 20px 54px;margin:0}
+  .steps li::before{
+    counter-increment:st; content:counter(st);
+    position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;
+    background:var(--step-bg);border:1px solid var(--step-bd);color:var(--text);
+    font:600 14px ui-monospace,Menlo,Consolas,monospace;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .steps li::after{content:"";position:absolute;left:17px;top:38px;bottom:2px;width:1px;background:var(--line2)}
+  .steps li:last-child::after{display:none}
+  .steps b{font-size:14.5px}
+  .steps p{margin:3px 0 6px;font-size:14px;color:var(--muted)}
+
+  /* ---------- Таблицы ---------- */
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+  th{font:600 12px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left}
+  th,td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td:first-child{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;white-space:nowrap}
+  tbody tr:nth-child(even){background:var(--card2)}
+
+  /* ---------- Глоссарий ---------- */
+  .gloss{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+  .gloss .card{border-left:3px solid var(--mn-bd)}
+  .gloss dt{font:600 14px ui-monospace,Menlo,Consolas,monospace;margin-bottom:5px}
+  .gloss dd{margin:0;font-size:13.5px;color:var(--muted)}
+
+  footer{border-top:1px solid var(--line);margin-top:70px;padding:26px 0 40px;color:var(--muted);font:13px ui-monospace,Menlo,Consolas,monospace}
+
+  /* ---------- Печать ---------- */
+  @media print{
+    html[data-theme="dark"]{
+      --bg:#fff; --bg2:#fff; --card:#fff; --card2:#fafafa;
+      --text:#111; --muted:#444; --line:#ccc; --line2:#999; --edge:#555;
+      --hero:#fff; --step-bg:#fff; --step-bd:#999;
+      --pg-bg:#e2efe3; --pg-bd:#9dbfa3; --pg-tx:#274d33;
+      --af-bg:#eae4f1; --af-bd:#b3a3c9; --af-tx:#463563;
+      --sp-bg:#e1eaf6; --sp-bd:#9fb6d8; --sp-tx:#28456e;
+      --mn-bg:#f4ecd9; --mn-bd:#c9b586; --mn-tx:#5d4a1f;
+      --kf-bg:#f7ecd6; --kf-bd:#cdb280; --kf-tx:#6b4e14;
+      --rd-bg:#f8e6e6; --rd-bd:#cf9d9d; --rd-tx:#6e2b2b;
+      --nt-bg:#eee; --nt-bd:#bbb; --nt-tx:#333;
+    }
+    .theme-toggle{display:none}
+    body{background:#fff}
+    header.hero{padding-top:10px}
+    .card,.scenario,.steps li,.figure,.tablewrap{break-inside:avoid}
+    h2{break-after:avoid}
+    a{color:inherit;text-decoration:none}
+    section{margin:34px 0}
+  }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeBtn" title="Переключить тему" aria-label="Переключить тему">☀</button>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="overline">Портфолио-кейс · Архитектура данных и ML</div>
+    <h1>Банковская антифрод система</h1>
+    <p class="lead">Потоковая платформа выявления мошеннических операций: детерминированные проверки по чёрным спискам в реальном времени, ML-скоринг транзакций обученной моделью и замкнутый цикл переобучения на свежих кейсах.</p>
+    <div class="meta">
+      <span>Автор: <b>Дмитрий Косарев</b></span>
+      <span>Год: <b>2026</b></span>
+      <span>Версия документа: <b>1.0</b></span>
+      <span>Формат: <b>архитектурный кейс</b></span>
+    </div>
+    <div class="tags">
+      <span class="tag t-kf">Apache Kafka</span>
+      <span class="tag t-sp">Apache Spark</span>
+      <span class="tag t-af">Apache Airflow</span>
+      <span class="tag t-pg">PostgreSQL</span>
+      <span class="tag t-rd">Redis</span>
+      <span class="tag t-mn">MinIO / S3</span>
+    </div>
+
+    <nav class="toc">
+      <h2>Содержание</h2>
+      <ol>
+        <li><a href="#overview">Обзор проекта</a></li>
+        <li><a href="#architecture">Архитектура решения</a></li>
+        <li><a href="#components">Ключевые компоненты</a></li>
+        <li><a href="#flows">Потоки данных и сценарии</a></li>
+        <li><a href="#storage">Хранилища данных</a></li>
+        <li><a href="#stack">Технологический стек</a></li>
+        <li><a href="#glossary">Глоссарий</a></li>
+        <li><a href="#conclusion">Заключение и развитие</a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ 1. ОБЗОР ============ -->
+<section id="overview">
+  <h2>1. Обзор проекта</h2>
+  <p>Антифрод — это контур защиты банка, который должен принимать решение о судьбе каждой операции <em>до того</em>, как она исполнена, и при этом не мешать легитимным клиентам. В кейсе спроектирована сквозная архитектура: от приёма транзакционного потока до исполнения вердикта и непрерывного дообучения модели на размеченных кейсах.</p>
+  <h3>Бизнес-задача</h3>
+  <ul>
+    <li>снижать потери от мошенничества, останавливая подозрительные операции до исполнения;</li>
+    <li>минимизировать false-positive: легитимные операции не должны задерживаться заметно для клиента;</li>
+    <li>принимать решения в режиме реального времени, при пиковых нагрузках платёжного потока;</li>
+    <li>обеспечивать аудируемость: каждый вердикт фиксируется и может быть объяснен;</li>
+    <li>постоянно улучшать качество детекции по мере накопления размеченных кейсов.</li>
+  </ul>
+  <h3>Требования к архитектуре</h3>
+  <ul>
+    <li><b>Real-time.</b> Проверка транзакции укладывается в миллисекунды: кэш чёрных списков + потоковый скоринг.</li>
+    <li><b>Масштабируемость.</b> Шина событий развязывает продюсеров и консюмеров, компоненты масштабируются независимо.</li>
+    <li><b>Разделимость контуров.</b> Онлайн-проверка и офлайн-обучение модели не мешают друг другу.</li>
+    <li><b>Отказоустойчивость.</b> Очереди сглаживают пики и позволяют повторять обработку.</li>
+    <li><b>Воспроизводимость ML.</b> Датасеты, артефакты моделей и логи обучений версионируются и хранятся централизованно.</li>
+  </ul>
+  <div class="note">Ключевая идея решения — двухслойная защита: дешёвые детерминированные правила (чёрные списки) отсекают заведомо известный фрод до тяжёлой ML-проверки, а модель ловит сложные скрытые паттерны на «белом» потоке.</div>
+</section>
+
+<!-- ============ 2. АРХИТЕКТУРА ============ -->
+<section id="architecture">
+  <h2>2. Архитектура решения</h2>
+  <p>Система состоит из двух контуров, объединённых общим хранилищем вердиктов и артефактов.</p>
+  <ul>
+    <li><b>Realtime-контур проверки.</b> Генератор транзакций → Kafka → проверка по чёрным спискам (с кэшем Redis) → «белый» поток в Kafka → потоковый скоринг обученной моделью на Spark → вердикт и исполнение через API.</li>
+    <li><b>ML-контур обучения.</b> Свежие кейсы → разметка в Postgres → экспорт датасета в MinIO/S3 → оркестрируемое Airflow обучение на Spark → артефакт модели в MinIO → логи и скоринг обучения в Postgres → новая версия модели подхватывается скорингом.</li>
+  </ul>
+  <p>Разделение ролей хранилищ осознанное: Redis держит «горячие» данные для миллисекундных обращений, Postgres выступает system of record (журналы вердиктов, разметка, результаты обучений), MinIO/S3 хранит крупные бинарные артефакты ML (датасеты, модели).</p>
+
+  <div class="figure">
+    <svg viewBox="0 0 1400 920" role="img" aria-label="Схема архитектуры антифрод-системы">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="arw"/>
+        </marker>
+      </defs>
+
+      <!-- Контейнеры -->
+      <rect x="180" y="40" width="300" height="330" rx="18" class="c-pg"/>
+      <text x="330" y="68" text-anchor="middle" class="ct-t">Postgres</text>
+      <rect x="760" y="40" width="460" height="260" rx="18" class="c-af"/>
+      <text x="1200" y="68" text-anchor="end" class="ct-t">Airflow</text>
+      <rect x="780" y="80" width="180" height="200" rx="14" class="c-mn"/>
+      <text x="870" y="104" text-anchor="middle" class="ct-t" style="font-size:12.5px">MinIO / S3</text>
+
+      <!-- Postgres: таблицы -->
+      <rect x="200" y="90"  width="260" height="40" rx="7" class="box"/><text x="330" y="115" text-anchor="middle" class="bx-t">Размеченные данные</text>
+      <rect x="200" y="145" width="260" height="40" rx="7" class="box"/><text x="330" y="162" text-anchor="middle" class="bx-t">Результаты обучения модели</text><text x="330" y="176" text-anchor="middle" class="bx-s">(логи с датой и скорингом)</text>
+      <rect x="200" y="200" width="260" height="40" rx="7" class="box"/><text x="330" y="225" text-anchor="middle" class="bx-t">Список заблокированных транзакций</text>
+      <rect x="200" y="255" width="260" height="40" rx="7" class="box"/><text x="330" y="280" text-anchor="middle" class="bx-t">Список одобренных транзакций</text>
+      <rect x="200" y="310" width="260" height="40" rx="7" class="box"/><text x="330" y="335" text-anchor="middle" class="bx-t">Чёрные списки</text>
+
+      <!-- MinIO: объекты -->
+      <rect x="795" y="120" width="150" height="40" rx="7" class="box"/><text x="870" y="145" text-anchor="middle" class="bx-t">Данные для обучения</text>
+      <rect x="795" y="190" width="150" height="40" rx="7" class="box"/><text x="870" y="215" text-anchor="middle" class="bx-t">Обученная модель</text>
+
+      <!-- Spark training (Airflow) -->
+      <rect x="1040" y="120" width="150" height="120" rx="10" class="box"/>
+      <text x="1115" y="176" text-anchor="middle" class="bx-t">Обучение Spark</text>
+      <text x="1115" y="194" text-anchor="middle" class="bx-s">запуск: Airflow</text>
+
+      <!-- Свежие кейсы -->
+      <rect x="20" y="120" width="120" height="50" rx="8" class="box"/><text x="80" y="149" text-anchor="middle" class="bx-t">Свежие кейсы</text>
+
+      <!-- SPARK scoring -->
+      <rect x="940" y="545" width="260" height="80" rx="12" class="c-sp"/>
+      <text x="1070" y="574" text-anchor="middle" class="ct-t" style="font-size:14px">SPARK</text>
+      <text x="1070" y="594" text-anchor="middle" class="bx-t">проверка транзакций</text>
+      <text x="1070" y="610" text-anchor="middle" class="bx-t">обученной моделью</text>
+
+      <!-- Realtime: узлы -->
+      <rect x="20"  y="560" width="100" height="50" rx="8" class="box"/><text x="70" y="589" text-anchor="middle" class="bx-t">Генератор</text>
+      <rect x="170" y="555" width="130" height="60" rx="8" class="box"/><text x="235" y="580" text-anchor="middle" class="bx-t">Kafka</text><text x="235" y="596" text-anchor="middle" class="bx-t">Транзакции</text>
+      <rect x="340" y="545" width="140" height="80" rx="10" class="box"/><text x="410" y="578" text-anchor="middle" class="bx-t">Проверка на</text><text x="410" y="594" text-anchor="middle" class="bx-t">чёрные списки</text>
+      <rect x="340" y="690" width="140" height="70" rx="10" class="box"/><text x="410" y="714" text-anchor="middle" class="bx-t">Redis</text><text x="410" y="730" text-anchor="middle" class="bx-s">чёрные списки в кэше</text>
+      <rect x="340" y="440" width="140" height="45" rx="22" class="d-rd"/><text x="410" y="467" text-anchor="middle" class="bx-t t-rd-f">Заблокировано</text>
+      <rect x="170" y="435" width="130" height="55" rx="8" class="box"/><text x="235" y="458" text-anchor="middle" class="bx-t">API</text><text x="235" y="472" text-anchor="middle" class="bx-s">(блок операции)</text>
+      <rect x="520" y="660" width="120" height="45" rx="22" class="d-pg"/><text x="580" y="687" text-anchor="middle" class="bx-t t-pg-f">Одобрено</text>
+      <rect x="700" y="555" width="140" height="60" rx="8" class="box"/><text x="770" y="580" text-anchor="middle" class="bx-t">Kafka</text><text x="770" y="596" text-anchor="middle" class="bx-t">Белые транзакции</text>
+      <rect x="940"  y="700" width="120" height="45" rx="22" class="d-rd"/><text x="1000" y="727" text-anchor="middle" class="bx-t t-rd-f">Заблокировано</text>
+      <rect x="1080" y="700" width="110" height="45" rx="22" class="d-pg"/><text x="1135" y="727" text-anchor="middle" class="bx-t t-pg-f">Одобрено</text>
+      <rect x="940"  y="790" width="120" height="50" rx="8" class="box"/><text x="1000" y="812" text-anchor="middle" class="bx-t">API</text><text x="1000" y="826" text-anchor="middle" class="bx-s">(блок операции)</text>
+      <rect x="1230" y="700" width="150" height="45" rx="8" class="box"/><text x="1305" y="720" text-anchor="middle" class="bx-t">API</text><text x="1305" y="734" text-anchor="middle" class="bx-s">(исполнение операции)</text>
+
+      <!-- Рёбра: ML-контур -->
+      <path d="M140,145 H170 V110 H200" class="ed" marker-end="url(#ar)"/>
+      <path d="M460,110 H640 V140 H795" class="ed" marker-end="url(#ar)"/>
+      <path d="M945,140 H1000 V180 H1040" class="ed" marker-end="url(#ar)"/>
+      <path d="M1040,210 H945" class="ed" marker-end="url(#ar)"/>
+      <path d="M1115,240 V340 H500 V165 H460" class="ed" marker-end="url(#ar)"/>
+      <path d="M870,230 V500 H1070 V545" class="ed" marker-end="url(#ar)"/>
+      <!-- Рёбра: хранилища -->
+      <path d="M200,330 H160 V725 H340" class="ed" marker-end="url(#ar)"/>
+      <path d="M410,625 V690" class="ed" marker-start="url(#ar)" marker-end="url(#ar)"/>
+      <!-- Рёбра: realtime -->
+      <path d="M120,585 H170" class="ed" marker-end="url(#ar)"/>
+      <path d="M300,585 H340" class="ed" marker-end="url(#ar)"/>
+      <path d="M410,545 V485" class="ed" marker-end="url(#ar)"/>
+      <path d="M340,462 H300" class="ed" marker-end="url(#ar)"/>
+      <path d="M480,462 H520 V220 H460" class="ed" marker-end="url(#ar)"/>
+      <path d="M480,600 V682 H520" class="ed" marker-end="url(#ar)"/>
+      <path d="M640,682 H670 V585 H700" class="ed" marker-end="url(#ar)"/>
+      <path d="M840,585 H940" class="ed" marker-end="url(#ar)"/>
+      <path d="M1000,625 V700" class="ed" marker-end="url(#ar)"/>
+      <path d="M1135,625 V700" class="ed" marker-end="url(#ar)"/>
+      <path d="M1000,745 V790" class="ed" marker-end="url(#ar)"/>
+      <path d="M1190,722 H1230" class="ed" marker-end="url(#ar)"/>
+      <!-- Журналы вердиктов -->
+      <path d="M940,722 H900 V860 H150 V220 H200" class="ed" marker-end="url(#ar)"/>
+      <path d="M1080,712 H920 V510 H330 V295" class="ed" marker-end="url(#ar)"/>
+    </svg>
+    <div class="legend">
+      <span class="tag t-pg">Postgres — system of record</span>
+      <span class="tag t-af">Airflow — оркестрация ML</span>
+      <span class="tag t-mn">MinIO / S3 — артефакты ML</span>
+      <span class="tag t-sp">Spark — потоковый скоринг</span>
+      <span class="tag t-kf">Kafka — шина событий</span>
+      <span class="tag t-rd">Redis — горячий кэш</span>
+    </div>
+    <div class="figcap">Рис. 1 — Целевая архитектура. Цветные контейнеры — границы подсистем; стрелки — направление потоков данных; двунаправленная стрелка — запрос/ответ к кэшу.</div>
+  </div>
+</section>
+
+<!-- ============ 3. КОМПОНЕНТЫ ============ -->
+<section id="components">
+  <h2>3. Ключевые компоненты</h2>
+  <div class="grid">
+    <div class="card"><div class="head"><span class="name">Генератор</span><span class="tag t-nt">источник</span></div>
+      <p>Продюсер транзакционного потока: эмитирует события платёжных операций клиента (карточные платежи, переводы, СБП-подобные операции).</p>
+      <span class="why"><b>Роль:</b> входная точка контура; задаёт темп и структуру событий.</span></div>
+    <div class="card"><div class="head"><span class="name">Kafka «Транзакции»</span><span class="tag t-kf">шина</span></div>
+      <p>Топик сырых событий операций. Принимает пиковые нагрузки и отдаёт их консюмеру в комфортном темпе, гарантирует доставку и возможность перечитывания.</p>
+      <span class="why"><b>Роль:</b> буфер и развязка между источником и проверяющим сервисом.</span></div>
+    <div class="card"><div class="head"><span class="name">Проверка на чёрные списки</span><span class="tag t-nt">сервис</span></div>
+      <p>Первый барьер скоринга: детерминированные правила и сверка клиента/операции с чёрными списками через кэш Redis. Выносит вердикт «заблокировано» или «одобрено».</p>
+      <span class="why"><b>Роль:</b> дешёвая фильтрация известного фрода до тяжёлой ML-проверки.</span></div>
+    <div class="card"><div class="head"><span class="name">Redis</span><span class="tag t-rd">кэш</span></div>
+      <p>Кэш чёрных списков с миллисекундной латентностью; синхронизируется из Postgres. Проверка транзакции не обращается к СУБД напрямую.</p>
+      <span class="why"><b>Роль:</b> горячие данные онлайн-проверки; защита Postgres от нагрузочного трафика.</span></div>
+    <div class="card"><div class="head"><span class="name">PostgreSQL</span><span class="tag t-pg">storage</span></div>
+      <p>System of record: чёрные списки, журналы заблокированных и одобренных транзакций, размеченные данные, результаты обучений модели.</p>
+      <span class="why"><b>Роль:</b> аудит, разметка и аналитика — всё, что требует транзакционности и SQL.</span></div>
+    <div class="card"><div class="head"><span class="name">Kafka «Белые транзакции»</span><span class="tag t-kf">шина</span></div>
+      <p>Топик операций, прошедших.rule-фильтр. Входной поток для ML-скоринга; позволяет независимо масштабировать и перечитывать «белый» трафик.</p>
+      <span class="why"><b>Роль:</b> очередь на модельную проверку; разделение потоков до и после правил.</span></div>
+    <div class="card"><div class="head"><span class="name">Spark — потоковый скоринг</span><span class="tag t-sp">streaming</span></div>
+      <p>Streaming-джоба проверяет белые транзакции обученной моделью (модель загружается из MinIO/S3) и выносит вердикт «заблокировано» / «одобрено».</p>
+      <span class="why"><b>Роль:</b> второй эшелон защиты: выявление сложных неочевидных паттернов фрода.</span></div>
+    <div class="card"><div class="head"><span class="name">MinIO / S3</span><span class="tag t-mn">object store</span></div>
+      <p>Объектное хранилище ML-артефактов: датасеты «данные для обучения» и версии артефакта «обученная модель».</p>
+      <span class="why"><b>Роль:</b> версионируемый обмен большими артефактами между обучением и скорингом.</span></div>
+    <div class="card"><div class="head"><span class="name">Airflow + Обучение Spark</span><span class="tag t-af">orchestration</span></div>
+      <p>Airflow по расписанию запускает Spark-джобу обучения: чтение датасета из MinIO, обучение, сохранение модели обратно в MinIO, запись логов и скоринга в Postgres.</p>
+      <span class="why"><b>Роль:</b> воспроизводимость и наблюдаемость ML-пайплайна: ретраи, расписание, история запусков.</span></div>
+    <div class="card"><div class="head"><span class="name">API исполнения вердиктов</span><span class="tag t-nt">интеграция</span></div>
+      <p>Точки интеграции с процессингом банка: «блок операции» и «исполнение операции». Вердикт антифрода превращается в действие над платежом.</p>
+      <span class="why"><b>Роль:</b> связка контура скоринга с банковским ядром.</span></div>
+  </div>
+</section>
+
+<!-- ============ 4. СЦЕНАРИИ ============ -->
+<section id="flows">
+  <h2>4. Потоки данных и сценарии</h2>
+  <p>Ниже — четыре сквозных сценария, покрывающих все ветви схемы: от блокировки по чёрному списку до замкнутого цикла переобучения модели.</p>
+
+  <div class="scenario">
+    <h3>Сценарий A. Блокировка по чёрному списку</h3>
+    <p class="sub">Realtime-контур, детерминированные правила</p>
+    <ol class="steps">
+      <li><b>Генератор → Kafka «Транзакции».</b><p>Событие операции публикуется в топик сырых транзакций.</p><span class="tag t-kf">Kafka</span></li>
+      <li><b>Чтение события.</b><p>Сервис проверки.consume-ит событие и извлекает ключи сверки (клиент, счёт, устройство, получатель).</p><span class="tag t-nt">Проверка на ЧС</span></li>
+      <li><b>Запрос к Redis.</b><p>Сверка с чёрными списками в кэше; при промахе кэш пополняется из Postgres «Чёрные списки».</p><span class="tag t-rd">Redis</span> <span class="tag t-pg">Postgres</span></li>
+      <li><b>Вердикт «Заблокировано» → API блока.</b><p>Попадaние в ЧС: вызов API «блок операции», платёж не исполняется.</p><span class="tag t-rd">Заблокировано</span> <span class="tag t-nt">API</span></li>
+      <li><b>Журналирование.</b><p>Транзакция фиксируется в Postgres «Список заблокированных транзакций» — аудиторский след для разборов и разметки.</p><span class="tag t-pg">Postgres</span></li>
+    </ol>
+  </div>
+
+  <div class="scenario">
+    <h3>Сценарий B. Чистая транзакция: одобрение моделью</h3>
+    <p class="sub">Realtime-контур, ML-скоринг</p>
+    <ol class="steps">
+      <li><b>Проверка по ЧС пройдена.</b><p>Попаданий в чёрные списки нет — промежуточный вердикт «Одобрено».</p><span class="tag t-pg">Одобрено</span></li>
+      <li><b>Публикация в Kafka «Белые транзакции».</b><p>Событие уходит в топик для модельной проверки второго эшелона.</p><span class="tag t-kf">Kafka</span></li>
+      <li><b>Скоринг на Spark.</b><p>Streaming-джоба строит признаки операции и применяет обученную модель, загруженную из MinIO/S3.</p><span class="tag t-sp">Spark</span> <span class="tag t-mn">MinIO</span></li>
+      <li><b>Вердикт «Одобрено» → API исполнения.</b><p>Скоринг ниже порога риска: операция исполняется штатно, клиент не замечает проверки.</p><span class="tag t-nt">API</span></li>
+      <li><b>Журналирование.</b><p>Вердикт записывается в Postgres «Список одобренных транзакций».</p><span class="tag t-pg">Postgres</span></li>
+    </ol>
+  </div>
+
+  <div class="scenario">
+    <h3>Сценарий C. Блокировка по вердикту модели</h3>
+    <p class="sub">Realtime-контур, ветвь риска</p>
+    <ol class="steps">
+      <li><b>Транзакция в «белом» потоке.</b><p>Правила и ЧС не сработали — операцию оценивает модель.</p><span class="tag t-kf">Kafka</span></li>
+      <li><b>Скоринг выше порога.</b><p>Spark вычисляет высокий скор риска: паттерн операции похож на мошеннический.</p><span class="tag t-sp">Spark</span></li>
+      <li><b>Вердикт «Заблокировано» → API блока.</b><p>Операция останавливается до исполнения.</p><span class="tag t-rd">Заблокировано</span> <span class="tag t-nt">API</span></li>
+      <li><b>Журналирование и передача в разметку.</b><p>Запись в Postgres «Список заблокированных»; кейс позднее попадает в работу аналитикам и станет частью размеченных данных.</p><span class="tag t-pg">Postgres</span></li>
+    </ol>
+  </div>
+
+  <div class="scenario">
+    <h3>Сценарий D. Цикл обучения модели</h3>
+    <p class="sub">ML-контур, офлайн</p>
+    <ol class="steps">
+      <li><b>Свежие кейсы → разметка.</b><p>Разборы инцидентов и жалобы клиентов превращаются в размеченные данные в Postgres.</p><span class="tag t-pg">Postgres</span></li>
+      <li><b>Экспорт датасета.</b><p>Размеченная выборка выгружается в MinIO/S3 как «Данные для обучения».</p><span class="tag t-mn">MinIO</span></li>
+      <li><b>Запуск пайплайна.</b><p>Airflow по расписанию (или по готовности данных) стартует джобу «Обучение Spark».</p><span class="tag t-af">Airflow</span></li>
+      <li><b>Обучение и публикация модели.</b><p>Джоба читает датасет из MinIO, обучает модель и сохраняет артефакт «Обученная модель» обратно в MinIO.</p><span class="tag t-sp">Spark</span> <span class="tag t-mn">MinIO</span></li>
+      <li><b>Логи и метрики.</b><p>Результаты обучения (логи с датой и скорингом качества) пишутся в Postgres для контроля деградации и сравнения версий.</p><span class="tag t-pg">Postgres</span></li>
+      <li><b>Замыкание цикла.</b><p>Скоринговый Spark подхватывает новую версию модели — качество онлайн-детекции растёт без ручных деплоев.</p><span class="tag t-sp">Spark</span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 5. ХРАНИЛИЩА ============ -->
+<section id="storage">
+  <h2>5. Хранилища данных</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Хранилище</th><th>Объекты / сущности</th><th>Роль в контуре</th></tr></thead>
+      <tbody>
+        <tr><td>PostgreSQL</td><td>Чёрные списки; список заблокированных; список одобренных; размеченные данные; результаты обучений</td><td>System of record: аудит вердиктов, источник чёрных списков, база разметки и метрик обучений; SQL-аналитика для ML</td></tr>
+        <tr><td>Redis</td><td>Кэш чёрных списков</td><td>Горячий слой realtime-проверки: миллисекундная сверка без нагрузки на СУБД</td></tr>
+        <tr><td>MinIO / S3</td><td>Данные для обучения; обученная модель</td><td>Версионируемое хранилище больших ML-артефактов; обмен датасетами и моделями между обучением и скорингом</td></tr>
+        <tr><td>Kafka</td><td>Топики «Транзакции», «Белые транзакции»</td><td>Персистентный поток событий: буферизация пиков, перечитывание, развязка компонентов</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note" style="margin-top:14px">Принцип разделения: «горячее» — в Redis, «истинное и аудируемое» — в Postgres, «крупное и бинарное» — в MinIO/S3, «поточное» — в Kafka. Каждое хранилище используется в своём режиме нагрузки.</div>
+</section>
+
+<!-- ============ 6. СТЕК ============ -->
+<section id="stack">
+  <h2>6. Технологический стек</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Технология</th><th>Роль в решении</th><th>Обоснование выбора</th></tr></thead>
+      <tbody>
+        <tr><td>Apache Kafka</td><td>Шина событий, топики транзакций</td><td>Высокая пропускная способность, развязка продюсер/консюмер, возможность перечитывания потоков</td></tr>
+        <tr><td>Redis</td><td>Кэш чёрных списков</td><td>Субмиллисекундная латентность онлайн-проверки; простое обновление наборов ключей</td></tr>
+        <tr><td>PostgreSQL</td><td>Журналы вердиктов, разметка, метрики обучений</td><td>ACID-надёжность для аудита, зрелая SQL-аналитика для подготовки разметки</td></tr>
+        <tr><td>Apache Spark (Streaming)</td><td>Realtime-скоринг обученной моделью</td><td>Горизонтальное масштабирование потоковой обработки; единый движок с обучением</td></tr>
+        <tr><td>Apache Spark (обучение)</td><td>Обучение модели на датасете из MinIO</td><td>Тот же движок, что и в скоринге: меньше расхождений train/inference-кода</td></tr>
+        <tr><td>Apache Airflow</td><td>Оркестрация ML-пайплайна</td><td>DAG-пайплайны, расписания, ретраи, наблюдаемость исторических запусков</td></tr>
+        <tr><td>MinIO / S3</td><td>Датасеты и артефакты моделей</td><td>S3-совместимость, версионирование объектов, дешёвое хранение больших артефактов</td></tr>
+        <tr><td>API-интеграции</td><td>Блок / исполнение операции</td><td>Синхронная связь вердиктов с процессингом банка без изменения банковского ядра</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 7. ГЛОССАРИЙ ============ -->
+<section id="glossary">
+  <h2>7. Глоссарий</h2>
+  <dl class="gloss">
+    <div class="card"><dt>Антифрод</dt><dd>Комплекс средств выявления и предотвращения мошеннических операций до их исполнения.</dd></div>
+    <div class="card"><dt>Чёрный список</dt><dd>Набор запрещённых ключей (клиенты, счета, устройства, получатели); попадание транзакции в список ведёт к блокировке.</dd></div>
+    <div class="card"><dt>Скоринг</dt><dd>Числовая оценка риска операции, вычисляемая моделью; сравнивается с порогом для вердикта.</dd></div>
+    <div class="card"><dt>Признаки (features)</dt><dd>Вычисляемые характеристики транзакции и контекста, подаваемые на вход модели.</dd></div>
+    <div class="card"><dt>Размеченные данные</dt><dd>Исторические кейсы с известным ответом «фрод / не фрод»; основа для обучения модели.</dd></div>
+    <div class="card"><dt>Артефакт модели</dt><dd>Сохранённый результат обучения (веса, метаданные), готовый к загрузке скорингом.</dd></div>
+    <div class="card"><dt>Оркестратор</dt><dd>Система управления пайплайнами (Airflow): порядок задач, расписания, повторные запуски.</dd></div>
+    <div class="card"><dt>Стриминговая обработка</dt><dd>Обработка событий непрерывно по мере поступления, с латентностью порядка секунд и ниже.</dd></div>
+    <div class="card"><dt>System of record</dt><dd>Источник истины: хранилище, где данные фиксируются транзакционно и неизменяемо для аудита.</dd></div>
+    <div class="card"><dt>Топик Kafka</dt><dd>Именованный журнал событий; продюсеры пишут в топик, консюмеры читают его независимо.</dd></div>
+  </dl>
+</section>
+
+<!-- ============ 8. ЗАКЛЮЧЕНИЕ ============ -->
+<section id="conclusion">
+  <h2>8. Заключение и направления развития</h2>
+  <h3>Итоги кейса</h3>
+  <ul>
+    <li>Спроектирован сквозной контур антифрода: от приёма события до исполнения вердикта и журналирования каждого решения.</li>
+    <li>Двухслойная детекция (чёрные списки + ML-скоринг) снижает нагрузку на модель и ускоряет остановку известного фрода.</li>
+    <li>Замкнутый ML-цикл (разметка → датасет → обучение → артефакт → скоринг) обеспечивает непрерывное улучшение качества без ручных деплоев.</li>
+    <li>Все вердикты аудируемы: журналы заблокированных и одобренных операций хранятся в system of record.</li>
+  </ul>
+  <h3>Сильные стороны архитектуры</h3>
+  <ul>
+    <li>слабая связанность компонентов через Kafka: каждый узел масштабируется и развивается независимо;</li>
+    <li>разделение онлайн- и офлайн-нагрузок: обучение не влияет на латентность проверок;</li>
+    <li>заменяемость: модель, правила и даже движки можно менять без перестройки контура;</li>
+    <li>наблюдаемость ML: логи обучений с датами и скорингом позволяют отслеживать деградацию качества.</li>
+  </ul>
+  <h3>Направления развития</h3>
+  <ul>
+    <li>мониторинг дрейфа признаков и автоматический триггер переобучения;</li>
+    <li>feature store для согласованного расчёта признаков в train и inference;</li>
+    <li>ML CI/CD: регрессионные тесты моделей и canary-вывод новых версий на часть трафика;</li>
+    <li>дополнительные эшелоны правил: графовая аналитика связей, device-фингерпринтинг;</li>
+    <li>автомасштабирование скоринга и тюнинг порогов по бизнес-метрикам (баланс потерь и false-positive).</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">Дмитрий Косарев · Банковская антифрод система · 2026 · v1.0</div>
+</footer>
+
+<script>
+  (function () {
+    var btn = document.getElementById('themeBtn');
+    var root = document.documentElement;
+    function icon() {
+      btn.textContent = root.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
+    }
+    icon();
+    btn.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('af-theme', next); } catch (e) {}
+      icon();
+    });
+  })();
+</script>
+</body>
+</html>
